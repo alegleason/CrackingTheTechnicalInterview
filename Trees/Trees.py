@@ -1,5 +1,6 @@
 from collections import deque
 
+
 # Helper classes
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
@@ -9,7 +10,7 @@ class TreeNode:
 
 
 class Solution:
-    # Binary Tree Zigzag Level Order Traversal - Top Interview Questions Medium
+    # Binary Tree Zigzag Level Order Traversal
     def zigzagLevelOrder(self, root):
         if not root:
             return []
@@ -37,12 +38,45 @@ class Solution:
             leftToRight = not leftToRight
         return zigZagOrder
 
+    # Construct Binary Tree from Preorder and Inorder Traversal
+    def buildTree(self, preorder, inorder):
+        return self.helper(0, 0, len(inorder) - 1, preorder, inorder)
 
-# tn = TreeNode(3)
-# tn.left = TreeNode(9)
-# tn.right = TreeNode(20)
-# tn.right.left = TreeNode(15)
-# tn.right.right = TreeNode(7)
+    def helper(self, instart, prestart, inend, preorder, inorder):
+        # Base case
+        if prestart > len(preorder) - 1 or instart > inend:
+            return None
+
+        # Create root and separate the left and right subtree using inorder
+        root = TreeNode(preorder[prestart])
+        splitIdx = 0
+        for i in range(instart, inend):
+            if inorder[i] == root.val:
+                splitIdx = i
+        # Recursion
+        root.left = self.helper(instart, prestart + 1, splitIdx - 1, preorder, inorder)
+        root.right = self.helper(splitIdx + 1, prestart + splitIdx - instart + 1, inend, preorder, inorder)
+        return root
+
+    # Kth Smallest Element in a BST
+    def kthSmallest(self, root, k):
+        # Time complexity of O(Height + lenStack)
+        st = deque()
+        while True:
+            while root:
+                st.appendleft(root)
+                root = root.left
+            root = st.popleft()
+            k -= 1
+            if k == 0:
+                return root.val
+            root = root.right  # Ensure not going back and adding right numbers on the correct position
+
+
+tn = TreeNode(4)
+tn.left = TreeNode(2)
+tn.right = TreeNode(5)
+tn.left.right = TreeNode(3)
 
 sol = Solution()
-# print(sol.zigzagLevelOrder(tn))
+print(sol.kthSmallest(tn, 1))

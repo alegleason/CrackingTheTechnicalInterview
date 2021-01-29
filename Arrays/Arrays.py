@@ -1,4 +1,5 @@
 import sys
+from collections import deque
 
 
 class Solution:
@@ -36,7 +37,30 @@ class Solution:
             return maxNumIdx
         return -1
 
+    # 498. Diagonal Traverse - Medium
+    def findDiagonalOrder(self, matrix):
+        diagonalOrder = []
+        if not matrix:
+            return diagonalOrder
+
+        N, M = len(matrix[0]), len(matrix)
+        D = M + N - 1
+        goingUp = True
+        for d in range(D):
+            row = 0 if d < N else d - N + 1
+            col = d if d < N else N - 1
+            tempQueue = deque()
+            while row < M and col >= 0:
+                tempQueue.appendleft(matrix[row][col]) if goingUp else tempQueue.append(matrix[row][col])
+                row += 1
+                col -= 1
+            diagonalOrder.extend(list(tempQueue))
+            goingUp = not goingUp
+
+        return diagonalOrder
+
 
 sol = Solution()
 # print(sol.pivotIndex([1,7,3,6,5,6]))
 # print(sol.dominantIndex([0,0,3,2]))
+print(sol.findDiagonalOrder([ [ 1, 2, 3], [ 4, 5, 6 ], [ 7, 8, 9 ] ]))
