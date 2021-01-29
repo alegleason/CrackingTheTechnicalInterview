@@ -59,8 +59,73 @@ class Solution:
 
         return diagonalOrder
 
+    # Return true if all chars on the string are unique otherwise false
+    def isUnique(self, string):
+        # We could argue it is both O(1) in time and space bc 128 is the limit
+        chars = [False for _ in range(128)]
+        for char in string:
+            if chars[ord(char)]:
+                return False
+            chars[ord(char)] = True
+        return True
+
+    # Return true if all chars on the string are unique otherwise false
+    def isUniqueImproved(self, string):
+        # Improve space complexity by using bitwise operation to check if the bit in that position has been turned on
+        chars = 0
+        for char in string:
+            # If the bit has been turned on...
+            if chars & 1 << ord(char) > 0:
+                return False
+            # Mark the bit as visited with an or operation
+            chars |= (1 << ord(char))
+        return True
+
+    # Return true if one string is a permutation of the other
+    def isPermutation(self, s1, s2):
+        # O(m+n) time complexity, O(128) space
+        if len(s1) != len(s2):
+            return False
+        # We assume is ASCII string, case sensitive and white spaces matter
+        charCount = [0] * 128
+        for char in s1:
+            charCount[ord(char)] += 1
+        for char in s2:
+            charCount[ord(char)] -= 1
+            # Check for discrepancies
+            if charCount[ord(char)] < 0:
+                return False
+        return True
+
+    # Given a string with white spaces, return it with them substituted by %20
+    def URLify(self, string, realLength):
+        # O(n) time complexity, O(1) space complexity
+        if not string:
+            return
+        spaceCount = 0
+        for i in range(realLength):
+            if string[i] == ' ':
+                spaceCount += 1
+        totalLength = realLength + spaceCount*2
+        while realLength:
+            if string[realLength - 1] != ' ':
+                string[totalLength - 1] = string[realLength - 1]
+                totalLength -= 1
+            else:
+                string[totalLength - 1] = '0'
+                string[totalLength - 2] = '2'
+                string[totalLength - 3] = '%'
+                totalLength -= 3
+            realLength -= 1
+        return ''.join(string)
+
+
+
 
 sol = Solution()
 # print(sol.pivotIndex([1,7,3,6,5,6]))
 # print(sol.dominantIndex([0,0,3,2]))
-print(sol.findDiagonalOrder([ [ 1, 2, 3], [ 4, 5, 6 ], [ 7, 8, 9 ] ]))
+# print(sol.findDiagonalOrder([ [ 1, 2, 3], [ 4, 5, 6 ], [ 7, 8, 9 ] ]))
+# print(sol.isUnique("abcdefghijklmnopqrstuvwxyzg"))
+# print(sol.isPermutation("abc", "bca"))
+# print(sol.URLify(['M', 'r', ' ', 'J', 'o', 'e', ' ', 'B', 'l', 'a', 'n', 't', 'o', 'n', ' ', ' ', ' ', ' '], 14))
