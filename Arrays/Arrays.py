@@ -1,5 +1,6 @@
 import sys
 from collections import deque
+import math
 
 
 class Solution:
@@ -106,7 +107,7 @@ class Solution:
         for i in range(realLength):
             if string[i] == ' ':
                 spaceCount += 1
-        totalLength = realLength + spaceCount*2
+        totalLength = realLength + spaceCount * 2
         while realLength:
             if string[realLength - 1] != ' ':
                 string[totalLength - 1] = string[realLength - 1]
@@ -119,8 +120,101 @@ class Solution:
             realLength -= 1
         return ''.join(string)
 
+    # Given a string, check if it is a permutation of a palindrome
+    def palindromePermutation(self, string):
+        string = string.lower()
+        bitVector = 0
+        # Setting the vector's bits on and off
+        for char in string:
+            if char.isalpha():
+                mask = 1 << ord(char)
+                # Toggling the bits
+                if bitVector & mask == 0:
+                    # Turn it on
+                    bitVector |= mask
+                else:
+                    # Turn it back off
+                    bitVector &= ~mask
+        return ((bitVector - 1) & bitVector) == 0 or bitVector == 0
 
+    # Check if two strings are one or zero editions away (insert, remove, replace)
+    def oneAway(self, s1, s2):
+        lenS1 = len(s1)
+        lenS2 = len(s2)
+        # O(n) time and O(1) space complexity
+        if lenS1 == lenS2:
+            # Check for replacements or equality
+            differenceFound = False
+            for i in range(lenS1):
+                if s1[i] != s2[i]:
+                    if differenceFound:
+                        return False
+                    differenceFound = True
+            return True
+        elif abs(lenS1 - lenS2) == 1:
+            # Check for insertions or deletions
+            differenceFound = False
+            idxS1, idxS2 = 0, 0
+            while idxS1 < lenS1 and idxS2 < lenS2:
+                if s1[idxS1] != s2[idxS2]:
+                    if differenceFound:
+                        return False
+                    differenceFound = True
+                    if lenS1 > lenS2:
+                        idxS1 += 1
+                    else:
+                        idxS2 += 1
+                idxS1 += 1
+                idxS2 += 1
+            return True
+        else:
+            return False
 
+    # Implement a method to perform string compression as aabcccccaa -> a2b1c5a3
+    def stringCompression(self, string):
+        # We could add a first traverse that checks if there will not be need for a string builder, though it adds time
+        retStr = []
+        compressionFlag = False
+        # O(n) both time and space complexity
+        i = 0
+        while i < len(string):
+            if i + 1 < len(string) and string[i] == string[i+1]:
+                compressionFlag = True
+                tempCount = 1
+                tempChar = string[i]
+                while i + 1 < len(string) and string[i] == string[i+1]:
+                    i += 1
+                    tempCount += 1
+                # Concat uses n2 time, that is why we use a list
+                retStr.append(tempChar)
+                retStr.append(str(tempCount))
+            else:
+                retStr.append(string[i])
+                retStr.append("1")
+            i += 1
+        return ''.join(retStr) if compressionFlag else string
+
+    # Given a NxN matrix, rotate it 90 degrees in place
+    def rotateMatrix(self, mat):
+        # O(n2) time and O(1) space complexity
+        if not mat or (len(mat) != len(mat[0])):
+            return False
+        N = len(mat)
+        for level in range(math.ceil(N/2)):
+            first = level
+            last = N - 1 - level
+            for i in range(first, last):
+                offset = i - first
+                top = mat[first][i]
+                # left -> top
+                mat[first][i] = mat[last-offset][first]
+                # bottom -> left
+                mat[last-offset][first] = mat[last][last-offset]
+                # right -> bottom
+                mat[last][last-offset] = mat[i][last]
+                # top -> right
+                mat[i][last] = top
+        return mat
 
 sol = Solution()
 # print(sol.pivotIndex([1,7,3,6,5,6]))
@@ -129,3 +223,7 @@ sol = Solution()
 # print(sol.isUnique("abcdefghijklmnopqrstuvwxyzg"))
 # print(sol.isPermutation("abc", "bca"))
 # print(sol.URLify(['M', 'r', ' ', 'J', 'o', 'e', ' ', 'B', 'l', 'a', 'n', 't', 'o', 'n', ' ', ' ', ' ', ' '], 14))
+# print(sol.palindromePermutation("Tact Coa"))
+# print(sol.oneAway("pale", "bake"))
+# print(sol.stringCompression("aabcccccaaa"))
+# print(sol.rotateMatrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]]))

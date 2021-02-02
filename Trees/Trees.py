@@ -72,11 +72,44 @@ class Solution:
                 return root.val
             root = root.right  # Ensure not going back and adding right numbers on the correct position
 
+    # Given an m x n 2d grid map of '1's (land) and '0's (water), return the number of islands.
+    def numIslands(self, grid):
+        rows = len(grid)
+        cols = len(grid[0])
+        # Shared matrix for visited cells
+        visited = [[False for _ in range(cols)] for _ in range(rows)]
+        count = 0
+        # O(NxM) time and space complexity
+        for row in range(rows):
+            for col in range(cols):
+                if not visited[row][col] and grid[row][col] == "1":
+                    self.DFS(grid, visited, row, col)
+                    count += 1
+        return count
 
-tn = TreeNode(4)
-tn.left = TreeNode(2)
-tn.right = TreeNode(5)
-tn.left.right = TreeNode(3)
+    def DFS(self, grid, visited, row, col):
+        # Generate movements (up, down, left, right)
+        rowsComb = [-1, 0, 1, 0]
+        colsComb = [0, 1, 0, -1]
+
+        # Mark current as visited
+        visited[row][col] = True
+
+        for k in range(4):
+            if self.isSafe(row + rowsComb[k], col + colsComb[k], visited, grid):
+                self.DFS(grid, visited, row + rowsComb[k], col + colsComb[k])
+
+    def isSafe(self, row, col, visited, grid):
+        if 0 <= row < len(grid) and 0 <= col < len(grid[0]) and not visited[row][col] and grid[row][col] == "1":
+            return True
+        return False
+
+
+# tn = TreeNode(4)
+# tn.left = TreeNode(2)
+# tn.right = TreeNode(5)
+# tn.left.right = TreeNode(3)
 
 sol = Solution()
-print(sol.kthSmallest(tn, 1))
+# print(sol.kthSmallest(tn, 1))
+print(sol.numIslands([["1", "0", "1", "0"], ["1", "0", "0", "1"], ["0", "1", "1", "0"]]))
