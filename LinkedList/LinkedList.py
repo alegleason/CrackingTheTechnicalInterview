@@ -1,24 +1,156 @@
-import math
-
-
 class Node:
-    def __init__(self, data=None):
-        self.data = data
+    def __init__(self, val):
+        self.val = val
         self.next = None
 
 
 class LinkedList:
     def __init__(self):
-        # Head is only an empty node pointing to the first value
-        self.head = Node()
+        self.head = None
 
-    # Adds new node containing 'data' to the end of the linked list.
-    def append(self, data):
-        new_node = Node(data)
-        curr = self.head
-        while curr.next is not None:
-            curr = curr.next
-        curr.next = new_node
+    # Appends at the end of a Linked List
+    def append(self, val):
+        temp = Node(val)
+        if self.head is None:
+            self.head = temp
+            return temp
+
+        n = self.head
+        while n:
+            if n.next is None:
+                n.next = temp
+                return temp
+            n = n.next
+        return temp
+
+    # Print the current list contents
+    def print(self):
+        n = self.head
+        while n:
+            print(n.val)
+            n = n.next
+
+    # Remove duplicates in a linked list
+    def removeDupsBuffer(self):
+        # O(n) both space and time
+        if not self.head or not self.head.next:
+            return self.head
+        buffer = set()
+        n = self.head
+        buffer.add(n.val)
+        while n.next:
+            if n.next.val in buffer:
+                n.next = n.next.next
+            else:
+                buffer.add(n.next.val)
+                n = n.next
+        return self.head
+
+    # Remove duplicates in a linked list with no buffer
+    def removeDupsNoBuffer(self):
+        # O(1) space, O(n2) time
+        if not self.head or not self.head.next:
+            return self.head
+
+        # First manage head
+        while self.isInList(self.head.val, self.head):
+            self.head = self.head.next
+
+        prev = self.head
+        n = self.head.next
+
+        while n:
+            if self.isInList(n.val, n):
+                prev.next = n.next
+            else:
+                prev = n
+            n = n.next
+        return self.head
+
+    # Returns true if the val is on list, else false. Starts searching on start node
+    def isInList(self, val, startNode):
+        n = startNode.next
+        while n:
+            if n.val == val:
+                return True
+            n = n.next
+        return False
+
+    # Returns the elements that is at len(list) - k position
+    def kthToLast(self, k):
+        # O(n) time and O(1) space complexity
+        # Move fast pointer k positions
+        k -= 1
+        fast = self.head
+        while k:
+            fast = fast.next
+            if fast is None:
+                raise IndexError("Error index out of range")
+            k -= 1
+
+        slow = self.head
+        while fast.next:
+            slow = slow.next
+            fast = fast.next
+
+        return slow
+
+    # Deletes the node of a list, only being provided with it, no head
+    def deleteNode(self, n):
+        # We will do this by overwriting until we get to the end
+        prev = n
+        while n.next:
+            n.val = n.next.val
+            prev = n
+            n = n.next
+        prev.next = None
+
+    # Partitions a list taking x as a divisor, with all < elements at the left, and >= at the right
+    def partition(self, x):
+        # O(n) time and O(1) space complexity
+        n = self.head
+        leftLast = leftFirst = rightLast = rightFirst = None
+        while n:
+            if n.val < x:
+                # Save first node from the left list
+                if not leftFirst:
+                    leftFirst = Node(n.val)
+                    leftLast = leftFirst
+                else:
+                    # Continue appending, order does not matters
+                    leftLast.next = Node(n.val)
+                    leftLast = leftLast.next
+            else:
+                # Save first node from the last list
+                if not rightFirst:
+                    rightFirst = Node(n.val)
+                    rightLast = rightFirst
+                else:
+                    rightLast.next = Node(n.val)
+                    rightLast = rightLast.next
+            n = n.next
+        # Point the head of our list to our first node
+        if leftLast:
+            leftLast.next = rightFirst
+            self.head = leftFirst
+        else:
+            self.head = rightFirst
+
+
+linkedList = LinkedList()
+linkedList.append(6)
+linkedList.append(3)
+linkedList.append(4)
+linkedList.append(3)
+linkedList.append(6)
+linkedList.append(8)
+# print(linkedList.kthToLast(6).val)
+# linkedList.deleteNode(node)
+linkedList.partition(5)
+linkedList.print()
+
+"""
+import math
 
     # Adds new node containing 'data' to the end of the linked list.
     def append_node(self, node):
@@ -35,15 +167,6 @@ class LinkedList:
             count += 1
             curr = curr.next
         return count
-
-    # Prints out the linked list in traditional Python list format.
-    def display(self):
-        elements = []
-        curr = self.head
-        while curr.next is not None:
-            curr = curr.next
-            elements.append(curr.data)
-        return elements
 
     # Returns the value of the node at 'index' 0 based
     def get(self, index):
@@ -75,7 +198,7 @@ class LinkedList:
 
     # Inserts a new node at index 'index' containing data 'data'.
     # Indices begin at 0. If the provided index is greater than or
-    # equal to the length of the linked list the 'data' will be appended.
+    # equal to the length of the linked list the 'data' will be appended
     def insert(self, index, data):
         if index >= self.length():
             return self.append(data)
@@ -135,98 +258,6 @@ class LinkedList:
             count += 1
         curr.data = data
         return
-
-    # O(n) time, buffer allowed
-    def remove_dups(self):
-        curr = self.head
-        index = 0
-        occurrences = dict()
-        deleted = 0
-        length = self.length()
-        while index < length:
-            curr = curr.next
-            if occurrences.get(curr.data) is None:
-                occurrences[curr.data] = True
-            else:
-                # If we did not have erase, just create a new list, push it and return it
-                self.erase(index - deleted)
-                deleted += 1
-            index += 1
-
-    # O(n2) time, no buffer allowed
-    def remove_dups_no_buffer(self):
-        curr = self.head
-        while curr is not None:
-            runner = curr
-            while runner.next is not None:
-                if runner.next.data == curr.data:
-                    runner.next = runner.next.next
-                else:
-                    runner = runner.next
-            curr = curr.next
-
-    # O(n) time, we have to return the element that is kth positions from the end.
-    # If we actually want the element, an alternative would be to wrap the index
-    # in a class and return in that way the node, zero based index.
-    def return_kth_to_last(self, head, kth):
-        if kth > self.length() - 1 or kth < 0:
-            print("ERROR: 'Get' Index out of range!")
-            return
-        if head is None:
-            return 0
-        index = self.return_kth_to_last(head.next, kth) + 1
-        if index - 1 == kth:
-            print("Kth element is: " + str(head.data))
-        return index
-
-    # O(n) time, iterative way, zero based index
-    def return_kth_to_last_iterative(self, kth):
-        if kth > self.length() - 1 or kth < 0:
-            print("ERROR: 'Get' Index out of range!")
-            return
-        p1 = self.head.next
-        p2 = p1
-        index = 1
-        while index <= kth:
-            p2 = p2.next
-            index += 1
-        while p2.next is not None:
-            p1 = p1.next
-            p2 = p2.next
-        print(p1.data)
-
-    # Delete the node passed by reference, we can only access it, not head
-    @staticmethod
-    def delete_middle_node(node):
-        curr = node
-        while curr.next is not None:
-            curr.data = curr.next.data
-            past = curr
-            curr = curr.next
-        past.next = None
-
-    # Partition the list given a value so that elements at left are smaller
-    # and at right are bigger than it.
-    def partition(self, value):
-        smaller = LinkedList()
-        bigger = LinkedList()
-        head = self.head.next
-        present_flag = 0
-        while head is not None:
-            if head.data < value:
-                smaller.append(head.data)
-            elif head.data > value:
-                bigger.append(head.data)
-            else:
-                present_flag = 1
-            head = head.next
-        if present_flag == 1:
-            smaller.append(value)
-        head = bigger.head.next
-        while head is not None:
-            smaller.append(head.data)
-            head = head.next
-        return smaller
 
     def sum_list_not_forward(self, list1, list2):
         res_inv = LinkedList()
@@ -344,3 +375,4 @@ class LinkedList:
             else:
                 return head.data
             head = head.next
+"""

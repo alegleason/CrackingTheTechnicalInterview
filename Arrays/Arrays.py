@@ -178,11 +178,11 @@ class Solution:
         # O(n) both time and space complexity
         i = 0
         while i < len(string):
-            if i + 1 < len(string) and string[i] == string[i+1]:
+            if i + 1 < len(string) and string[i] == string[i + 1]:
                 compressionFlag = True
                 tempCount = 1
                 tempChar = string[i]
-                while i + 1 < len(string) and string[i] == string[i+1]:
+                while i + 1 < len(string) and string[i] == string[i + 1]:
                     i += 1
                     tempCount += 1
                 # Concat uses n2 time, that is why we use a list
@@ -200,21 +200,76 @@ class Solution:
         if not mat or (len(mat) != len(mat[0])):
             return False
         N = len(mat)
-        for level in range(math.ceil(N/2)):
+        for level in range(math.ceil(N / 2)):
             first = level
             last = N - 1 - level
             for i in range(first, last):
                 offset = i - first
                 top = mat[first][i]
                 # left -> top
-                mat[first][i] = mat[last-offset][first]
+                mat[first][i] = mat[last - offset][first]
                 # bottom -> left
-                mat[last-offset][first] = mat[last][last-offset]
+                mat[last - offset][first] = mat[last][last - offset]
                 # right -> bottom
-                mat[last][last-offset] = mat[i][last]
+                mat[last][last - offset] = mat[i][last]
                 # top -> right
                 mat[i][last] = top
         return mat
+
+    # Given a matrix, put the row and col to 0 if an element is equal to 0
+    def zeroMatrix(self, mat):
+        # O(n2) time and O(1) space complexity
+        # We will use the first position in each row and col as markers
+        firstRowZero = False
+        firstColZero = False
+        # Search if first row has zeroes
+        for col in range(len(mat[0])):
+            if mat[0][col] == 0:
+                firstRowZero = True
+                break
+        # Search if first col has zeroes
+        for row in range(len(mat)):
+            if mat[row][0] == 0:
+                firstColZero = True
+                break
+
+        for row in range(1, len(mat)):
+            for col in range(1, len(mat[0])):
+                if mat[row][col] == 0:
+                    mat[0][col] = 0
+                    mat[row][0] = 0
+
+        # Now we can fill rows and cols
+        for row in range(1, len(mat)):
+            if mat[row][0] == 0:
+                self.setRowZeroes(mat, row)
+
+        for col in range(1, len(mat[0])):
+            if mat[0][col] == 0:
+                self.setColZeroes(mat, col)
+
+        if firstRowZero:
+            self.setRowZeroes(mat, 0)
+
+        if firstColZero:
+            self.setColZeroes(mat, 0)
+
+        return mat
+
+    def setRowZeroes(self, mat, row):
+        for col in range(len(mat[0])):
+            mat[row][col] = 0
+
+    def setColZeroes(self, mat, col):
+        for row in range(1, len(mat)):
+            mat[row][col] = 0
+
+    def stringRotation(self, s1, s2):
+        # s1 is rotated, s2 is original
+        s1 = s1 + s1
+        return True if s2 in s1 else False
+
+
 
 sol = Solution()
 # print(sol.pivotIndex([1,7,3,6,5,6]))
@@ -227,3 +282,5 @@ sol = Solution()
 # print(sol.oneAway("pale", "bake"))
 # print(sol.stringCompression("aabcccccaaa"))
 # print(sol.rotateMatrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]]))
+# print(sol.zeroMatrix([[0, 2, 3], [4, 0, 6], [7, 8, 9]]))
+print(sol.stringRotation("erbottlewat", "waterbottle"))
