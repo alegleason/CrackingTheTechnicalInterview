@@ -1,3 +1,9 @@
+class PartialSum:
+    def __init__(self):
+        self.sum = None
+        self.carry = 0
+
+
 class Node:
     def __init__(self, val):
         self.val = val
@@ -29,6 +35,15 @@ class LinkedList:
         while n:
             print(n.val)
             n = n.next
+
+    # Returns the length (integer) of the linked list.
+    def length(self):
+        count = 0
+        n = self.head
+        while n:
+            n = n.next
+            count += 1
+        return count
 
     # Remove duplicates in a linked list
     def removeDupsBuffer(self):
@@ -136,38 +151,76 @@ class LinkedList:
         else:
             self.head = rightFirst
 
+    # Fx that returns the sum as 7 -> 1 -> 6 + 5 -> 9 -> 2 = 2 -> 1 -> 9
+    def sum_lists_backward(self, l1, l2, carry=0):
+        # O(n) time and space complexity
+        if not l1 and not l2:
+            return None
 
-linkedList = LinkedList()
-linkedList.append(6)
-linkedList.append(3)
-linkedList.append(4)
-linkedList.append(3)
-linkedList.append(6)
-linkedList.append(8)
-# print(linkedList.kthToLast(6).val)
-# linkedList.deleteNode(node)
-linkedList.partition(5)
-linkedList.print()
+        value = carry
+
+        if l1:
+            value += l1.val
+
+        if l2:
+            value += l2.val
+
+        res = Node(value % 10)
+
+        if l1 or l2:
+            res.next = (self.sum_lists_backward(None if not l1 else l1.next, None if not l2 else l2.next,
+                                                1 if value >= 10 else 0))
+
+        return res
+
+    # Fx that returns the sum as 6 -> 1 -> 7 + 2- > 9 -> 5 = 9 -> 1 -> 2
+    def sum_lists_forward(self, l1, l2):
+        # O(n) both time and space complexity
+        lenL1 = l1.length()
+        lenL2 = l2.length()
+
+        # Fill with zeros so we sum units w units, tens w tens and so on
+        if lenL1 < lenL2:
+            l1.head = l1.fill_with_zeroes(lenL2 - lenL1)
+        elif lenL2 < lenL1:
+            l2.head = l2.fill_with_zeroes(lenL1 - lenL2)
+
+        tempSum = self.sum_helper(l1.head, l2.head)
+
+        # Add the final carry
+        if tempSum.carry > 0:
+            return self.insert_before(tempSum.carry, tempSum.sum)
+        else:
+            return tempSum.sum
+
+    def sum_helper(self, l1, l2):
+        if not l1 and not l2:
+            # Empty sum object
+            return PartialSum()
+        tempSum = self.sum_helper(l1.next, l2.next)
+        value = l1.val + l2.val + tempSum.carry
+        # Insert the result of the temp sum before our current sum...
+        fullResult = self.insert_before(value % 10, tempSum.sum)
+        tempSum.sum = fullResult
+        # ... and update the carry too with 0 or for the next sum
+        tempSum.carry = int(value / 10)
+        return tempSum
+
+    def fill_with_zeroes(self, zeros):
+        for _ in range(zeros):
+            self.head = self.insert_before(0, self.head)
+        return self.head
+
+    def insert_before(self, val, l1):
+        n = Node(val)
+        if l1:
+            n.next = l1
+        return n
+
+
+linkedList1 = LinkedList()
 
 """
-import math
-
-    # Adds new node containing 'data' to the end of the linked list.
-    def append_node(self, node):
-        curr = self.head
-        while curr.next is not None:
-            curr = curr.next
-        curr.next = node
-
-    # Returns the length (integer) of the linked list.
-    def length(self):
-        count = 0
-        curr = self.head
-        while curr.next is not None:
-            count += 1
-            curr = curr.next
-        return count
-
     # Returns the value of the node at 'index' 0 based
     def get(self, index):
         if index >= self.length():
