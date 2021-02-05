@@ -269,18 +269,24 @@ class Solution:
         s1 = s1 + s1
         return True if s2 in s1 else False
 
+    # Given an array of intervals (start, end), return them merged if possible
+    def mergeIntervals(self, intervals):
+        # O(nlogn) time and O(n) space complexity
+        intervals = sorted(intervals)  # Or intervals.sort(key=lambda x: x[0])
+        # Append the first interval
+        mergedIntervals = [intervals[0]]
+        for currStart, currEnd in intervals[1:]:
+            # Get the last element we appended
+            lastStart, lastEnd = mergedIntervals[-1]
+            # If start tame is >= our current start time, update end time
+            if currStart <= lastEnd <= currEnd:
+                # Update the registry
+                mergedIntervals[-1] = (lastStart, currEnd)
+            elif currStart > lastEnd:
+                mergedIntervals.append((currStart, currEnd))
+
+        return mergedIntervals
 
 
 sol = Solution()
-# print(sol.pivotIndex([1,7,3,6,5,6]))
-# print(sol.dominantIndex([0,0,3,2]))
-# print(sol.findDiagonalOrder([ [ 1, 2, 3], [ 4, 5, 6 ], [ 7, 8, 9 ] ]))
-# print(sol.isUnique("abcdefghijklmnopqrstuvwxyzg"))
-# print(sol.isPermutation("abc", "bca"))
-# print(sol.URLify(['M', 'r', ' ', 'J', 'o', 'e', ' ', 'B', 'l', 'a', 'n', 't', 'o', 'n', ' ', ' ', ' ', ' '], 14))
-# print(sol.palindromePermutation("Tact Coa"))
-# print(sol.oneAway("pale", "bake"))
-# print(sol.stringCompression("aabcccccaaa"))
-# print(sol.rotateMatrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]]))
-# print(sol.zeroMatrix([[0, 2, 3], [4, 0, 6], [7, 8, 9]]))
-print(sol.stringRotation("erbottlewat", "waterbottle"))
+print(sol.mergeIntervals([(1, 8), (2, 5)]))

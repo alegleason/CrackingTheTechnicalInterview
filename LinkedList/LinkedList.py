@@ -1,3 +1,6 @@
+from collections import deque
+
+
 class PartialSum:
     def __init__(self):
         self.sum = None
@@ -16,7 +19,10 @@ class LinkedList:
 
     # Appends at the end of a Linked List
     def append(self, val):
-        temp = Node(val)
+        if not isinstance(val, Node):
+            temp = Node(val)
+        else:
+            temp = val
         if self.head is None:
             self.head = temp
             return temp
@@ -170,7 +176,6 @@ class LinkedList:
         if l1 or l2:
             res.next = (self.sum_lists_backward(None if not l1 else l1.next, None if not l2 else l2.next,
                                                 1 if value >= 10 else 0))
-
         return res
 
     # Fx that returns the sum as 6 -> 1 -> 7 + 2- > 9 -> 5 = 9 -> 1 -> 2
@@ -217,8 +222,96 @@ class LinkedList:
             n.next = l1
         return n
 
+    # Return True if a linked list is palindrome otherwise, false
+    def isPalindrome(self):
+        # O(n) time and O(n/2) space complexity
+        stack = deque()
+        slow = fast = self.head
+        while fast.next and fast.next.next:
+            stack.appendleft(slow.val)
+            slow = slow.next
+            fast = fast.next.next
+        stack.appendleft(slow.val)
+        # If we have odd elements, forward one position
+        if fast.next:
+            slow = slow.next
 
-linkedList1 = LinkedList()
+        # Compare both halves
+        while slow:
+            if stack.popleft() != slow.val:
+                return False
+            slow = slow.next
+
+        return True
+
+    def areEqual(self, l1):
+        n = l1.head
+        m = self.head
+        while n and m:
+            if n.val != m.val:
+                return False
+            n = n.next
+            m = m.next
+        return True
+
+    def reverse(self):
+        prev = None
+        curr = self.head
+        nxt = curr.next
+        while curr:
+            curr.next = prev
+            if not nxt:
+                break
+            prev = curr
+            curr = nxt
+            nxt = nxt.next
+        self.head = curr
+
+    # Return True if two linked lists intersect, otherwise false
+    def intersect(self, l2):
+        # O(A+B) time and O(1) space complexity
+        # Get both tail and size from each list
+        sz1, t1 = self.getTailAndSize()
+        sz2, t2 = l2.getTailAndSize()
+
+        # If they have different tails, return immediately
+        if t1 != t2:
+            return False
+
+        # Move pointers to equal starts
+        if sz1 > sz2:
+            # Move first list pointer n positions
+            self.head = self.returnKthNode(sz1 - sz2)
+        elif sz2 > sz1:
+            l2.head = l2.returnKthNode(sz2 - sz1)
+
+        # Now just iterate to find the common node and return it
+        n = self.head
+        m = l2.head
+        # They have the same size already
+        while n:
+            if n == m:
+                return n
+            n = n.next
+            m = m.next
+
+        return False
+
+    def returnKthNode(self, k):
+        n = self.head
+        while k:
+            n = n.next
+            k -= 1
+        return n
+
+    def getTailAndSize(self):
+        n = self.head
+        count = 1
+        while n.next:
+            count += 1
+            n = n.next
+        return count, n
+
 
 """
     # Returns the value of the node at 'index' 0 based
@@ -301,7 +394,7 @@ linkedList1 = LinkedList()
     # to the length of the linked list a warning will be printed
     # to the user.
     def set(self, index, data):
-        if self.length() <= index or index < 0:
+        if self.length ) <= index or index < 0:
             print("ERROR: 'Set' Index out of range!")
             return
         count = -1
@@ -311,121 +404,4 @@ linkedList1 = LinkedList()
             count += 1
         curr.data = data
         return
-
-    def sum_list_not_forward(self, list1, list2):
-        res_inv = LinkedList()
-        n1 = list1.length()
-        n2 = list2.length()
-        if n1 == 0 or n2 == 0:
-            return
-        count = 0
-        carry = 0
-        while count < max(n1, n2):
-            num1 = list1.get(count)
-            num2 = list2.get(count)
-            if num1 is not None and num2 is not None:
-                new_carry = 1 if num1.data + num2.data + carry >= 10 else 0
-                res_inv.append(num1.data + num2.data + carry) if num1.data + num2.data + carry < 10 else res_inv.append(
-                    num1.data + num2.data + carry - 10)
-                carry = new_carry
-            elif num1 is not None:
-                res_inv.append(num1.data)
-            elif num2 is not None:
-                res_inv.append(num2.data)
-            count += 1
-        i = 0
-        res = LinkedList()
-        return res_inv
-
-    #O(n2) time, O(n) space
-    def sum_list_forward(self, list1, list2):
-        res_inv = LinkedList()
-        n1 = list1.length()
-        n2 = list2.length()
-        if n1 == 0 or n2 == 0:
-            return
-        count = 0
-        carry = 0
-        while count < max(n1, n2):
-            num1 = list1.get(max(n1, n2) - count - 1)
-            num2 = list2.get(max(n1, n2) - count - 1)
-            if num1 is not None and num2 is not None:
-                new_carry = 1 if num1.data + num2.data + carry >= 10 else 0
-                res_inv.append(num1.data + num2.data + carry) if num1.data + num2.data + carry < 10 else res_inv.append(num1.data + num2.data + carry - 10)
-                carry = new_carry
-            elif num1 is not None:
-                res_inv.append(num1.data)
-            elif num2 is not None:
-                res_inv.append(num2.data)
-            count += 1
-        i = 0
-        res = LinkedList()
-        while i < count:
-            res.append(res_inv.get(count - i - 1).data)
-            i += 1
-        return res
-
-    #O(kn) time, where k is n/2 and n is list.length, O(1) space
-    def palindrome(self):
-        i = 0
-        n = math.floor(self.length()/2)
-        le = self.length() - 1
-        while i < n:
-            if self.get(i).data != self.get(le - i).data:
-                return False
-            i += 1
-        return True
-
-    # O(n) time, O(n) space
-    def reverse(self):
-        # Initializing values
-        prev = None
-        curr = self.head.next
-        nex = curr.next
-        while curr is not None:
-            print(curr.data)
-            # reversing the link
-            curr.next = prev
-            # moving to next node
-            prev = curr
-            curr = nex
-            if nex is not None:
-                nex = nex.next
-        # initializing head
-        self.head.next = prev
-        return self
-
-    # O(nXm) time, O(1) space
-    def intersect(self, list1, list2):
-        len1 = list1.length()
-        len2 = list2.length()
-        # Chop until they are same length
-        if len1 > len2:
-            dif = len1 - len2
-            while dif > 0:
-                list1.erase(0)
-                dif -= 1
-        elif len2 > len1:
-            dif = len2 - len1
-            while dif > 0:
-                list2.erase(0)
-                dif -= 1
-        head1 = list1.head.next
-        head2 = list2.head.next
-        while head1 is not None:
-            if head1 == head2:
-                return True
-            head1 = head1.next
-            head2 = head2.next
-        return False
-
-    def loop_detection(self):
-        dic = dict()
-        head = self.head.next
-        while head is not None:
-            if dic.get(head) is None:
-                dic[head] = True
-            else:
-                return head.data
-            head = head.next
 """

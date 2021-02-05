@@ -104,12 +104,21 @@ class Solution:
             return True
         return False
 
+    def inorder(self, root):
+        if not root:
+            return
+        self.inorder(root.left)
+        print(root.val)
+        self.inorder(root.right)
 
-# tn = TreeNode(4)
-# tn.left = TreeNode(2)
-# tn.right = TreeNode(5)
-# tn.left.right = TreeNode(3)
+
+tn = TreeNode(10)
+tn.left = TreeNode(12)
+tn.left.left = TreeNode(25)
+tn.left.right = TreeNode(30)
+tn.right = TreeNode(15)
+tn.right.left = TreeNode(36)
 
 sol = Solution()
-# print(sol.kthSmallest(tn, 1))
-print(sol.numIslands([["1", "0", "1", "0"], ["1", "0", "0", "1"], ["0", "1", "1", "0"]]))
+sol.inorder(tn)
+
