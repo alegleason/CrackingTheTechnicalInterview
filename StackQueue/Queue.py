@@ -1,67 +1,64 @@
+import sys
 from collections import deque
 
 
-class QueueFromStacks:
-    # NOTE: This was implemented with stacks using deque() should you
-    # want to use Stack class, just replace with the reverse translation,
-    # which can be found at Stack.py
-    __s1 = deque()
-    __s2 = deque()
-
-    # Add an item to the end of the list.
-    def add(self, item):
-        self.__s1.append(item)
-
-    # Remove the first item in the list.
-    def remove(self):
-        while len(self.__s1) > 0:
-            curr = self.__s1[len(self.__s1) - 1]
-            self.__s1.pop()
-            self.__s2.append(curr)
-        self.__s2.pop()
-
-        # Re assigning the values to s1
-        while len(self.__s2) > 0:
-            curr = self.__s2[len(self.__s2) - 1]
-            self.__s2.pop()
-            self.__s1.append(curr)
-
-    # Return the top of the queue.
-    def peek(self):
-        while len(self.__s1) > 0:
-            curr = self.__s1[len(self.__s1) - 1]
-            self.__s1.pop()
-            self.__s2.append(curr)
-
-        res = self.__s2[len(self.__s2) - 1]
-
-        while len(self.__s2) > 0:
-            curr = self.__s2[len(self.__s2) - 1]
-            self.__s2.pop()
-            self.__s1.append(curr)
-
-        return res
-
-    # Return true if and only if the queue is empty.
-    def isEmpty(self):
-        return True if len(self.__s1) == 0 else False
+class NodeQueue:
+    def __init__(self, data=None):
+        self.data = data
+        self.next = None
 
 
+# Implement a Queue structure from scratch
 class Queue:
-    __queue = deque()
+    first_node = None
+    last_node = None
 
-    # Add an item to the end of the list.
-    def add(self, item):
-        self.__queue.append(item)
+    # Add an item to the end of the queue
+    def add(self, data):
+        n = NodeQueue(data)
+        # End has been assigned
+        if self.last_node is not None:
+            self.last_node.next = n
+        self.last_node = n
+        # Start has not been assigned
+        if self.first_node is None:
+            self.first_node = self.last_node
 
-    # Remove the first item in the list.
+    # Remove the first added item from the queue
     def remove(self):
-        self.__queue.popleft()
+        if self.first_node is None:
+            raise ValueError('Stack is empty')
+        n = self.first_node.data
+        self.first_node = self.first_node.next
+        # Mark both start and end empty
+        if self.first_node is None:
+            self.last_node = None
+        return n
 
-    # Return the top of the queue.
+    # Return the first added item of the queue
     def peek(self):
-        return self.__queue[0]
+        return self.first_node.data
 
-    # Return true if and only if the queue is empty.
+    # Return true if the queue is empty
     def isEmpty(self):
-        return True if len(self.__queue) == 0 else False
+        return self.first_node.data is None
+
+    # Print the content of the queue
+    def print(self):
+        n = self.first_node
+        while n:
+            print(n.data)
+            n = n.next
+
+
+queue = Queue()
+queue.add(10)
+queue.add(20)
+queue.add(30)
+queue.print()
+print(queue.peek())
+print("removing ", queue.remove())
+print("removing ", queue.remove())
+print("removing ", queue.remove())
+queue.add(40)
+queue.print()

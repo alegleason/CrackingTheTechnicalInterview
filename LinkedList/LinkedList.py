@@ -297,6 +297,30 @@ class LinkedList:
 
         return False
 
+    # Given a linked list return the node that loops it, if exists
+    def loopDetection(self):
+        # O(n) time and O(1) space complexity
+        slow_pointer = fast_pointer = self.head
+        # Find meeting point, which will be LOOP_SIZE - k steps into the linked list
+        while fast_pointer and fast_pointer.next:
+            slow_pointer = slow_pointer.next
+            fast_pointer = fast_pointer.next.next
+            if slow_pointer == fast_pointer:
+                break
+
+        # No meeting point
+        if not fast_pointer or not fast_pointer.next:
+            return None
+
+        # Move the slow pointer to the beginning and look for the collision point
+        slow_pointer = self.head
+        while slow_pointer != fast_pointer:
+            slow_pointer = slow_pointer.next
+            fast_pointer = fast_pointer.next
+
+        # Return common node
+        return fast_pointer
+
     def returnKthNode(self, k):
         n = self.head
         while k:
@@ -313,95 +337,11 @@ class LinkedList:
         return count, n
 
 
-"""
-    # Returns the value of the node at 'index' 0 based
-    def get(self, index):
-        if index >= self.length():
-            print("Error: 'Get' Index out of range!")
-            return None
-        count = -1
-        curr = self.head
-        while count != index:
-            curr = curr.next
-            count += 1
-        return curr
-
-    # Deletes the node at index 'index'.
-    def erase(self, index):
-        if index >= self.length():
-            print("Error: 'Erase' Index out of range!")
-            return
-        count = -1
-        curr = self.head
-        while count != (index - 1):
-            curr = curr.next
-            count += 1
-        curr.next = curr.next.next
-
-    # Allows for bracket operator syntax (i.e. a[0] to return first item).
-    def __getitem__(self, index):
-        return self.get(index)
-
-    # Inserts a new node at index 'index' containing data 'data'.
-    # Indices begin at 0. If the provided index is greater than or
-    # equal to the length of the linked list the 'data' will be appended
-    def insert(self, index, data):
-        if index >= self.length():
-            return self.append(data)
-        if index < 0:
-            print("ERROR: 'Insert' Index cannot be negative!")
-            return
-        cur_node = self.head
-        prior_node = self.head
-        cur_idx = 0
-        while True:
-            cur_node = cur_node.next
-            if cur_idx == index:
-                new_node = Node(data)
-                prior_node.next = new_node
-                new_node.next = cur_node
-                return
-            prior_node = cur_node
-            cur_idx += 1
-
-    # Inserts the node 'node' at index 'index'. Indices begin at 0.
-    # If the 'index' is greater than or equal to the length of the linked
-    # list the 'node' will be appended.
-    def insert_node(self, index, node):
-        if index >= self.length():
-            curr = self.head
-            while curr.next is not None:
-                curr = curr.next
-            curr.next = node
-            return
-        if index < 0:
-            print("ERROR: 'Insert' Index cannot be negative!")
-            return
-        curr = self.head
-        prev = self.head
-        count = -1
-        while True:
-            curr = curr.next
-            count += 1
-            if index == count:
-                prev.next = node
-                node.next = curr
-                return
-            prev = curr
-
-    # Sets the data at index 'index' equal to 'data'.
-    # Indices begin at 0. If the 'index' is greater than or equal
-    # to the length of the linked list a warning will be printed
-    # to the user.
-    def set(self, index, data):
-        if self.length ) <= index or index < 0:
-            print("ERROR: 'Set' Index out of range!")
-            return
-        count = -1
-        curr = self.head
-        while index != count:
-            curr = curr.next
-            count += 1
-        curr.data = data
-        return
-"""
+linkedList = LinkedList()
+linkedList.append(10)
+linkedList.append(20)
+linkedList.append(30)
+node = linkedList.append(40)
+linkedList.append(50)
+linkedList.append(node)
+print(linkedList.loopDetection().val)

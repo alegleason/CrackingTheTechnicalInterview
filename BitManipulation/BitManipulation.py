@@ -2,6 +2,7 @@
 import math
 
 
+# Returns the bit at the index i (1/0)
 def get_bit(num, i):
     return num & (1 << i) != 0
 
