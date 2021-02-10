@@ -1,8 +1,3 @@
-import os
-from math import sqrt
-from itertools import count, islice
-
-
 def CalculateTaxes(income, tax_brackets_table):  # 8,000
     if len(tax_brackets_table) == 0:
         raise Exception('Please check table')
@@ -32,11 +27,20 @@ def CalculateTaxes(income, tax_brackets_table):  # 8,000
 # CalculateTaxes(8000, [[5000, 0], [10000, .1], [20000, .2], [10000, .3], [None, .4]])
 
 def tupleizer():
+    # Helper function to detect prime numbers
+    def isPrime(n):
+        # 1 is not prime by definition, neither nums < 0
+        if num < 2: return False
+        for i in range(2, n):
+            if n % i == 0:
+                return False
+        return True
+
     # Read contents of file
     f = open("integers.txt", "r")
-    # Check for empty file
-    if os.stat("integers.txt").st_size == 0:
-        return
+    # Check for empty file - No imports :(
+    # if os.stat("integers.txt").st_size == 0:
+    #    return
     temp_list = []
     # Iterate through the values
     for num in f:
@@ -56,7 +60,7 @@ def tupleizer():
         if num % 2 == 0:
             even_nums += 1
         # Check if number is prime
-        if num > 1 and all(num % i != 0 for i in islice(count(2), int(sqrt(num) - 1))):
+        if isPrime(num):
             prime_nums += 1
     # Print report
     print('The difference between the largest and smallest value: ', abs(min(int_tuple) - max(int_tuple)))
@@ -71,9 +75,6 @@ def tupleizer():
 def altnet():
     # Read contents of file
     f = open("file.txt", "r")
-    # Check for empty file
-    if os.stat("file.txt").st_size == 0:
-        return
     message_flag = False
     topic_dict = dict()
     for row in f:
@@ -102,7 +103,7 @@ def altnet():
                         topic_dict[topic] = []
                     # Retrieve the subtopic
                     # print("Starting at idx ", 5+len(topic), " on string ", copy_str)
-                    copy_str = copy_str[5+len(topic):]
+                    copy_str = copy_str[5 + len(topic):]
                     if len(copy_str) > 0:
                         topic_dict[topic].append(copy_str)
                     else:
@@ -128,7 +129,7 @@ def calculator():
         # Capture first and second number
         first_num = input('Enter first number: ')
         first_num = float(first_num) if first_num != "" else 0
-        second_num = float(input('Enter second number: '))
+        second_num = input('Enter second number: ')
         second_num = float(second_num) if second_num != "" else 0
         # Perform the actual operations
         if op == '+':
@@ -151,9 +152,6 @@ def calculator():
 def MeetMyTeam():
     # Read contents of file
     f = open("team.txt", "r")
-    # Check for empty file
-    if os.stat("team.txt").st_size == 0:
-        return
     names = []
     activities = []
     members_not_interested = 0
@@ -183,17 +181,12 @@ def MeetMyTeam():
     names.sort()
     print('Team members in alphabetical order: ', ', '.join(names))
 
-def test(myX):
-    myX = 5
 
+"""
 if __name__ == '__main__':
-    # tupleizer()
+    tupleizer()
     altnet()
-    # calculator()
-    # MeetMyTeam()
+    calculator()
+    MeetMyTeam()
     print("Done")
-    global x
-    x = 0
-    print("x is ", x)
-    test(x)
-    print("x is ", x)
+"""
