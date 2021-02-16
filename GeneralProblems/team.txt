@@ -1,16 +1,12 @@
-Jane Groot {jgroot@address.edu}
-Jane Groot {senior}
-Jane Groot My interests include {swimming, dancing, python}
-Jane Groot I am committed to me and my team members learning Python
-Ricardo Antonio {ricardo@address.edu}
-Ricardo Antonio {junior}
-Ricardo Antonio My interests include {swimming, singing, juggling}
-Ricardo Antonio I am committed to me and my team members learning Python
-Alejandro Gleason {alegleason@address.edu}
-Alejandro Gleason {sophomore}
-Alejandro Gleason My interests include {hiking, fishing, reading}
+Alejandro Gleason {alejandrogleasonm@gmail.com}
+Alejandro Gleason {junior}
+Alejandro Gleason My interests include {iOS, cybersecurity, algorithms}
 Alejandro Gleason I am committed to me and my team members learning Python
-Jane Grey {jgrey@address.edu}
-Jane Grey {senior}
-Jane Grey My interests include {movies, running, biking}
-Jane Grey I am not committed to me and my team members learning Python
+Seniru Kottegoda {seniru.nk@gmail.com}
+Seniru Kottegoda {junior}
+Seniru Kottegoda My interests include {biomechanics, robotics, data_science}
+Seniru Kottegoda I am committed to me and my team members learning Python
+Ricardo Vazquez {r.antonio.vazquez@outlook.com}
+Ricardo Vazquez {junior}
+Ricardo Vazquez My interests include {cybersecurity, software_engineering, machine_learning}
+Ricardo Vazquez I am committed to me and my team members learning Python
