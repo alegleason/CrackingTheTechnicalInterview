@@ -1,3 +1,11 @@
+from collections import deque, defaultdict
+
+class Node:
+    def __init__(self, x, next=None, random=None):
+        self.val = int(x)
+        self.next = next
+        self.random = random
+
 def CalculateTaxes(income, tax_brackets_table):  # 8,000
     if len(tax_brackets_table) == 0:
         raise Exception('Please check table')
@@ -129,14 +137,76 @@ class Solution:
             if nums[i] > max_so_far: max_so_far = nums[i]
         return max_so_far
 
+    # 71. Simplify Path LeetCode
+    def simplifyPath(self, path):
+        stack = deque()
+        path = path.split('/')
+        for p in path:
+            if p == '.':
+                continue
+            elif p == '..':
+                if stack:
+                    stack.pop()
+            elif p != '':
+                stack.append(p)
+        return '/'+'/'.join(list(stack))
+
+    # 138. Copy List with Random Pointer LeetCode
+    def copyRandomList(self, head: 'Node') -> 'Node':
+        # O(2n) time and O(1) space complexity
+        new_list = defaultdict(lambda: None)
+        # Copy as a dictionary on a first pass to have acess to all node objects
+        n = head
+        while n:
+            # We basically copy the list to have access to the node by object reference
+            new_list[n] = Node(n.val)
+            n = n.next
+        # Now, update both the random and next pointers
+        n = head
+        while n:
+            new_list[n].next = new_list[n.next]
+            new_list[n].random = new_list[n.random]
+            n = n.next
+        return new_list[head]
+
+    # 140. Word Break II LeetCode
+    def wordBreak(self, s, wordDict):
+        return self.wordBreakHelper(s, wordDict, dict())
+
+    def wordBreakHelper(self, s, wordDict, dp):
+        results = []
+        # Base case
+        if s == "":
+            results.append("")
+            return results
+        elif s in dp:
+            # Use memoization
+            return dp[s]
+
+        # Recursive calls
+        for word in wordDict:
+            if s.startswith(word):
+                subset = self.wordBreakHelper(s[len(word):], wordDict, dp)
+
+                for subst in subset:
+                    # Just add the space if we actually got a result back
+                    opt_space = " " if subst != "" else ""
+                    results.append(word + opt_space + subst)
+
+        dp[s] = results
+        return results
+
+
+
 
 
 
 sol = Solution()
-print(sol.generateParenthesis(3))
-print(sol.combinationSum([2, 3, 6, 7], 7))
-print(sol.myPow(2.0, 10))
-print(sol.restoreIpAddresses("101023"))
-print(sol.maxProfit([7, 1, 5, 6]))
-print(sol.maxSubArray([7, 1, 5, 6]))
-print(sol.maxSubArray([-2, 1]))
+# print(sol.generateParenthesis(3))
+# print(sol.combinationSum([2, 3, 6, 7], 7))
+# print(sol.myPow(2.0, 10))
+# print(sol.restoreIpAddresses("101023"))
+# print(sol.maxProfit([7, 1, 5, 6]))
+# print(sol.maxSubArray([7, 1, 5, 6]))
+# print((sol.simplifyPath("/home/")))
+print(sol.wordBreak("pineapplepenapple", ["apple", "pen", "applepen", "pine", "pineapple"]))
