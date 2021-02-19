@@ -1,10 +1,21 @@
 from collections import deque, defaultdict
+import heapq
+import sys
+
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
 
 class Node:
     def __init__(self, x, next=None, random=None):
         self.val = int(x)
         self.next = next
         self.random = random
+
 
 def CalculateTaxes(income, tax_brackets_table):  # 8,000
     if len(tax_brackets_table) == 0:
@@ -122,7 +133,7 @@ class Solution:
         # Using Kadane's algorithm so we can handle negative inputs
         max_cur, max_so_far = 0, 0
         for i in range(1, len(prices)):
-            temp = max_cur + prices[i] - prices[i-1]
+            temp = max_cur + prices[i] - prices[i - 1]
             max_cur = max(0, temp)
             max_so_far = max(max_cur, max_so_far)
         return max_so_far
@@ -132,8 +143,8 @@ class Solution:
         # Using DP
         max_so_far = nums[0]
         for i in range(1, len(nums)):
-            if nums[i] + nums[i-1] > nums[i]:
-                nums[i] += nums[i-1]
+            if nums[i] + nums[i - 1] > nums[i]:
+                nums[i] += nums[i - 1]
             if nums[i] > max_so_far: max_so_far = nums[i]
         return max_so_far
 
@@ -149,7 +160,7 @@ class Solution:
                     stack.pop()
             elif p != '':
                 stack.append(p)
-        return '/'+'/'.join(list(stack))
+        return '/' + '/'.join(list(stack))
 
     # 138. Copy List with Random Pointer LeetCode
     def copyRandomList(self, head: 'Node') -> 'Node':
@@ -196,9 +207,92 @@ class Solution:
         dp[s] = results
         return results
 
+    # 199. Binary Tree Right Side View LeetCode
+    def rightSideView(self, root):
+        # BFS approach
+        if not root: return []
+        queue = deque()
+        queue.append(root)
+        res = [root.val]
+        while queue:
+            # BFS uses a queue DS
+            q = len(queue)
+            level = []
+            for i in range(q):
+                curr_node = queue.popleft()
+                # Append child nodes
+                if curr_node.left:
+                    queue.append(curr_node.left)
+                    level.append(curr_node.left.val)
+                if curr_node.right:
+                    queue.append(curr_node.right)
+                    level.append(curr_node.right.val)
+            if level: res.append(level[-1])
+        return res
 
+    # 347. Top K Frequent Elements LeetCode
+    def topKFrequent(self, nums, k):
+        # O(NlogK) time and O(N) space complexity
+        ans = []
+        freq = dict()
+        for num in nums:
+            if num in freq:
+                freq[num] += 1
+            else:
+                freq[num] = 1
+        # Use a min heap to store the most frequent elements
+        for key, value in freq.items():
+            if len(ans) < k:
+                heapq.heappush(ans, [value, key])
+            else:
+                # heappushpop() removes and returns the smallest element
+                heapq.heappushpop(ans, [value, key])
 
+        # Return the top k frequent elements, which are stored in the key part
+        return [key for value, key in ans]
 
+    # 238. Product of Array Except Self LeetCode
+    def productExceptSelf(self, nums):
+        # O(n) time and O(1) space complexity
+        n = len(nums)
+        ans = [0] * n
+        R = ans[0] = 1
+        # Fill left and right product arrays
+        for i in range(1, n):
+            ans[i] = nums[i - 1] * ans[i - 1]
+        for i in reversed(range(n)):
+            ans[i] = ans[i] * R
+            R *= nums[i]
+        return ans
+
+    # 286. Walls and Gates LeetCode
+    def wallsAndGates(self, rooms):
+        if not rooms: return []
+        for row in range(len(rooms)):
+            for col in range(len(rooms[row])):
+                if rooms[row][col] == 0:
+                    self.DFS(row, col, 0, rooms)
+        return rooms
+
+    def DFS(self, row, col, count, rooms):
+        if self.isValidCell(row, col, count, rooms):
+            rooms[row][col] = count
+            # Traverse neighboring cells
+            row_movements = [-1, 0, 1, 0]
+            col_movements = [0, 1, 0, -1]
+            for i in range(len(row_movements)):
+                self.DFS(row+row_movements[i], col+col_movements[i], count + 1, rooms)
+
+        return
+
+    def isValidCell(self, row, col, count, rooms):
+        # Inside boundaries
+        if 0 <= row < len(rooms) and 0 <= col < len(rooms[0]):
+            if rooms[row][col] < count:
+                return False
+            else:
+                return True
+        return False
 
 
 sol = Solution()
@@ -209,4 +303,15 @@ sol = Solution()
 # print(sol.maxProfit([7, 1, 5, 6]))
 # print(sol.maxSubArray([7, 1, 5, 6]))
 # print((sol.simplifyPath("/home/")))
-print(sol.wordBreak("pineapplepenapple", ["apple", "pen", "applepen", "pine", "pineapple"]))
+# print(sol.wordBreak("pineapplepenapple", ["apple", "pen", "applepen", "pine", "pineapple"]))
+# print(sol.rightSideView(root))
+# print(sol.topKFrequent([1,1,1,2,2,3], 2))
+# print(sol.productExceptSelf([1,2,3,4]))
+inf = sys.maxsize
+mat = [
+    [inf,inf, inf],
+    [0,inf,-1],
+    [inf,-1,inf]
+    ]
+print(sol.wallsAndGates(mat))
+
