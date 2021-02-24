@@ -42,6 +42,7 @@ class Codec:
         new_node.right = self.deserializeHelper(nodes_to_deserialize)
         return new_node
 
+
 root = TreeNode(1)
 root.left = TreeNode(2)
 root.right = TreeNode(3)
@@ -52,4 +53,3 @@ codec = Codec()
 nn = codec.deserialize(codec.serialize(root))
 print(nn)
 print(codec.serialize(nn))
-

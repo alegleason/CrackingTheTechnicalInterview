@@ -281,7 +281,7 @@ class Solution:
             row_movements = [-1, 0, 1, 0]
             col_movements = [0, 1, 0, -1]
             for i in range(len(row_movements)):
-                self.DFS(row+row_movements[i], col+col_movements[i], count + 1, rooms)
+                self.DFS(row + row_movements[i], col + col_movements[i], count + 1, rooms)
 
         return
 
@@ -293,6 +293,152 @@ class Solution:
             else:
                 return True
         return False
+
+    # 300. Longest Increasing Subsequence LeetCode
+    def lengthOfLIS(self, nums):
+        # O(n2) time and O(n) space complexity
+        n = len(nums)
+        if n == 1:
+            return 1
+
+        dp = [1] * n
+        max_dp = 1
+        for j in range(1, n):
+            lis = 1
+            for i in range(j):
+                if nums[j] > nums[i]:
+                    lis = max(lis, dp[i] + 1)
+            dp[j] = lis
+            max_dp = max(max_dp, dp[j])
+
+        return max_dp
+
+    # 354. Russian Doll Envelopes
+    def maxEnvelopes(self, envelopes):
+        # O(n2) time and O(n) space complexity
+        n = len(envelopes)
+        if n == 1:
+            return 1
+        elif n == 0:
+            return 0
+        dp = [1] * n
+        dp_max = 1
+        # Sort width and height by ascending order
+        envelopes.sort()
+        for j in range(n):
+            lis = 1
+            for i in range(j):
+                # Compare both width and height to check for fit
+                if envelopes[j][0] > envelopes[i][0] and envelopes[j][1] > envelopes[i][1]:
+                    lis = max(lis, dp[i] + 1)
+            dp[j] = lis
+            dp_max = max(dp[j], dp_max)
+
+        return dp_max
+
+    # 674. Longest Continuous Increasing Subsequence LeetCode
+    def findLengthOfLCIS(self, nums):
+        if not nums: return 0
+        # O(n) time and O(1) space
+        max_len = 1
+        lics = 1
+        for i in range(1, len(nums)):
+            if nums[i] > nums[i - 1]:
+                lics += 1
+            else:
+                max_len = max(lics, max_len)
+                lics = 1
+
+        return max(max_len, lics)
+
+    # 62. Unique Paths
+    def uniquePaths(self, m, n):
+        memoize = [[None for _ in range(n + 1)] for _ in range(m + 1)]
+        return self.uniquePathsDFS(m, n, 0, 0, memoize)
+
+    def uniquePathsDFS(self, m, n, row, col, grid):
+        # Check boundaries
+        if row == (m - 1) and col == (n - 1):
+            return 1
+        elif row < 0 or row >= m or col < 0 or col >= n:
+            return 0
+        # Achieved goal
+        elif grid[row][col] is not None:
+            return grid[row][col]
+        # DFS
+        grid[row][col] = self.uniquePathsDFS(m, n, row, col + 1, grid) + self.uniquePathsDFS(m, n, row + 1, col, grid)
+        return grid[row][col]
+
+    # 400. Nth Digit LeetCode
+    def findNthDigit(self, n):
+        # 1st step: Find tier
+        level = low = 1
+        top = 9
+        while n > level * top:
+            n -= level * top
+            level += 1
+            low *= 10
+            top *= 10
+        # 2nd step: Find number
+        low += (n-1) / level
+        # 3rd step: Find the digit
+        return str(low)[(n-1) % level]
+
+    # 637. Valid Word Abbreviation LeetCode
+    def validAbbr(self, s, abbr):
+        n = len(s)
+        a = len(abbr)
+        i = 0
+        j = 0
+        while i < a:
+            if abbr[i].isnumeric():
+                t = " "
+                while True and i < a:
+                    if abbr[i].isnumeric():
+                        t += abbr[i]
+                    else:
+                        break
+                    i += 1
+                j += int(t)
+                if j > n:
+                    return False
+                elif j == n:
+                    return True
+
+            if abbr[i] != s[j]:
+                return False
+            i += 1
+            j += 1
+
+        return True
+
+    # 415. Add Strings LeetCode
+    def addStrings(self, num1, num2):
+        # O(n) time and O(1) space complexity
+        ln1 = len(num1)
+        ln2 = len(num2)
+        num1 = num1[::-1]
+        num2 = num2[::-1]
+        carry = res = 0
+        # Perform basic math addition
+        for i in range(max(ln1, ln2)):
+            t1 = t2 = "0"
+            if i < ln1:
+                t1 = num1[i]
+            if i < ln2:
+                t2 = num2[i]
+            # ord() return the ascii val, converting it
+            temp = (ord(t1) - 48 + ord(t2) - 48 + carry)
+            if temp > 10:
+                res += (temp % 10) * (pow(10, i))
+                carry = 1
+            else:
+                res += temp * (pow(10, i))
+                carry = 0
+        # Add final carry
+        if carry:
+            res += 1 * (pow(10, max(ln1, ln2)))
+        return str(res)
 
 
 sol = Solution()
@@ -307,11 +453,11 @@ sol = Solution()
 # print(sol.rightSideView(root))
 # print(sol.topKFrequent([1,1,1,2,2,3], 2))
 # print(sol.productExceptSelf([1,2,3,4]))
-inf = sys.maxsize
-mat = [
-    [inf,inf, inf],
-    [0,inf,-1],
-    [inf,-1,inf]
-    ]
-print(sol.wallsAndGates(mat))
-
+# print(sol.wallsAndGates(mat))
+# print(sol.lengthOfLIS([0,3,1,6,2,2,7]))
+# print(sol.maxEnvelopes([[5,4],[6,5],[6,7],[2,3]]))
+# print(sol.findLengthOfLCIS([1,3,5,4,2,3,4,5]))
+# print(sol.uniquePaths(3, 7))
+# print(sol.findNthDigit(1000))
+# print(sol.validAbbr("word", "1o1d"))
+print(sol.addStrings("9", "9"))
