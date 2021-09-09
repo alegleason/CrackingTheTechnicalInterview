@@ -73,9 +73,11 @@ def altnet():
                 copy_str = copy_str[5 + len(topic):]
                 # Add the subtopics
                 if len(copy_str) > 0:
-                    topic_dict[topic].append(copy_str)
+                    if copy_str not in topic_dict[topic]:
+                        topic_dict[topic].append(copy_str)
                 else:
-                    topic_dict[topic].append('root')
+                    if 'root' not in topic_dict[topic]:
+                        topic_dict[topic].append('root')
     # Analyze the dictionary
     total_newsgroups = 0
     max_subtopics = [0, ""]
@@ -136,9 +138,9 @@ def calculator():
             continue
         # Capture first and second number
         first_num = input('Enter first number: ')
-        first_num = float(first_num) if first_num != "" else 0
+        first_num = float(first_num) if first_num != "" else 0.0
         second_num = input('Enter second number: ')
-        second_num = float(second_num) if second_num != "" else 0
+        second_num = float(second_num) if second_num != "" else 0.0
         # Perform the actual operations
         if op == '+':
             print(round(first_num + second_num, 2))
@@ -195,8 +197,8 @@ def MeetMyTeam():
 
 
 if __name__ == '__main__':
-    tupleizer()
+    # tupleizer()
     altnet()
-    calculator()
-    MeetMyTeam()
+    # calculator()
+    # MeetMyTeam()
     print("Done")

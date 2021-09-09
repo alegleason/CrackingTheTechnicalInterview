@@ -380,9 +380,9 @@ class Solution:
             low *= 10
             top *= 10
         # 2nd step: Find number
-        low += (n-1) / level
+        low += (n - 1) / level
         # 3rd step: Find the digit
-        return str(low)[(n-1) % level]
+        return str(low)[(n - 1) % level]
 
     # 637. Valid Word Abbreviation LeetCode
     def validAbbr(self, s, abbr):
@@ -440,8 +440,71 @@ class Solution:
             res += 1 * (pow(10, max(ln1, ln2)))
         return str(res)
 
+    memo = {}
+
+    # 494. Target Sum LeetCode
+    def findTargetSumWays(self, nums, S):
+        if not nums:
+            return 0
+        idx = len(nums) - 1
+        curr_sum = 0
+        return self.findTargetSumWaysHelper(nums, S, idx, curr_sum)
+
+    def findTargetSumWaysHelper(self, nums, target, index, curr_sum):
+        # Base case - Memoization
+        if (index, curr_sum) in self.memo:
+            return self.memo[(index, curr_sum)]
+
+        # Going backwards
+        if index < 0 and curr_sum == target:
+            return 1
+        if index < 0:
+            return 0
+
+        # Recursive exploration
+        pos = self.findTargetSumWaysHelper(nums, target, index - 1, curr_sum + nums[index])
+        neg = self.findTargetSumWaysHelper(nums, target, index - 1, curr_sum - nums[index])
+
+        self.memo[(index, curr_sum)] = pos + neg
+        return self.memo[(index, curr_sum)]
+
+    def checkOperations(self, a, signs, b, c):
+        # Declare output list of same length
+        output = [False] * len(a)
+        for i, sign in enumerate(signs):
+            # Hold the current operation for later compare
+            curr = a[i] + b[i] if sign == '+' else a[i] - b[i]  # a[i] sign[i] b[i]
+            # Compare the result and adjust if needed
+            if curr == c[i]:
+                output[i] = True
+        # Return boolean like list
+        return output
+
+    def binaryPatternMatching(self, pattern, s):
+        vowels = {'a', 'e', 'i', 'o', 'u', 'y'} # create a set of vowels for O(1) access
+        matches = 0
+        i = 0
+        # Let's try comparing letter by letter on the run
+        while i < (len(s)):
+            j = i
+            for idx, char in enumerate(pattern):
+                currChar = s[j]
+                # Break if any condition was not met
+                if char == "0" and currChar not in vowels:
+                    break
+                elif char == "1" and currChar in vowels:
+                    break
+                # If we have arrived at the end, update the counter
+                if idx == len(pattern) - 1:
+                    matches += 1
+                j += 1
+            i += 1
+        return matches
+
 
 sol = Solution()
+# print(sol.binaryPatternMatching("010", "amazing"))
+# print(sol.checkOperations([3, 2, -1, 4], ['+', '-', '-', '+'], [2, 7, -5, 2], [5, 5, 4, 2]))
 # print(sol.generateParenthesis(3))
 # print(sol.combinationSum([2, 3, 6, 7], 7))
 # print(sol.myPow(2.0, 10))
@@ -460,4 +523,5 @@ sol = Solution()
 # print(sol.uniquePaths(3, 7))
 # print(sol.findNthDigit(1000))
 # print(sol.validAbbr("word", "1o1d"))
-print(sol.addStrings("9", "9"))
+# print(sol.addStrings("9", "9"))
+# print(sol.findTargetSumWays([1, 0], 1))
