@@ -3,6 +3,7 @@
 import sys
 from collections import Counter
 
+
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
         self.val = val
@@ -30,17 +31,16 @@ class Node:
         self.next = next
 
 
-tn = TreeNode(5)
-tn.left = TreeNode(1)
-tn.right = TreeNode(8)
-tn.right.left = TreeNode(6)
-tn.right.right = TreeNode(10)
+tn = TreeNode(7)
+tn.right = TreeNode(2)
+tn.right.right = TreeNode(1)
 
-ll = ListNode(-10)
-ll.next = ListNode(-3)
-ll.next.next = ListNode(6)
-ll.next.next.next = ListNode(5)
-ll.next.next.next.next = ListNode(9)
+ll = ListNode(3)
+ll2 = ListNode(2)
+ll.next = ll2
+ll.next.next = ListNode(0)
+ll.next.next.next = ListNode(-4)
+ll.next.next.next.next = ll2
 
 rl = Node(7)
 rl.next = Node(13)
@@ -206,7 +206,7 @@ class Solution:
     # 316. Remove Duplicate Letters
     def removeDuplicateLetters(self, s):
         counter = Counter(s)
-        stack = [] # use append() to push and pop() to remove
+        stack = []  # use append() to push and pop() to remove
         visited = set()
         for char in s:
             counter[char] -= 1
@@ -221,6 +221,169 @@ class Solution:
             stack.append(char)
         return "".join(stack)
 
+    # 33. Search in Rotated Sorted Array
+    def search(self, nums, target):
+        left, right = 0, len(nums) - 1
+        while left <= right:
+            # check for target value
+            mid = left + (right - left) // 2
+            if nums[mid] == target:
+                return mid
+            # determine if it is left rotated or right rotated
+            if nums[mid] >= nums[left]:  # left rotated
+                # in ascending order side
+                if nums[left] <= target <= nums[mid]:
+                    right = mid - 1
+                else:
+                    left = mid + 1
+            else:  # right rotated
+                # in ascending order side
+                if nums[mid] < target <= nums[right]:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+        return -1
+
+    firstElement = None
+    secondElement = None
+    prevElement = TreeNode(sys.maxsize * -1)
+
+    # 99. Recover Binary Search Tree
+    def recoverTree(self, root):
+        if not root:
+            return root
+        # check the inorder traversal
+        self.inorder(root)
+        # exchange the order
+
+        temp = self.firstElement.val
+        self.firstElement.val = self.secondElement.val
+        self.secondElement.val = temp
+        return root
+
+    def inorder(self, root):
+        if root.left:
+            self.inorder(root.left)
+
+        if self.firstElement is None and self.prevElement.val >= root.val:
+            self.firstElement = self.prevElement
+
+        if self.firstElement is not None and self.prevElement.val >= root.val:
+            self.secondElement = root
+
+        self.prevElement = root
+
+        if root.right:
+            self.inorder(root.right)
+
+    # 141. Linked List Cycle
+    def hasCycle(self, head):
+        # If there are no nodes or just one
+        if not head.next or not head:
+            return False
+
+        # Use slow and fast pointer technique
+        slow, fast = head, head
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+            if slow == fast:
+                return True
+
+        return False
+
+    # 142. Linked List Cycle II
+    def detectCycle(self, head):
+        # If there are no nodes or just one
+        if not head or not head.next:
+            return None
+        slow = fast = head
+        # Find intersection
+        while fast and fast.next:
+            fast = fast.next.next
+            slow = slow.next
+            if slow == fast:
+                # Found intersection, both start and intersect nodes will be at the same distance from target node
+                start = head
+                while start != slow:
+                    start = start.next
+                    slow = slow.next
+                return start
+
+        return None
+
+    ans = None
+
+    def recurse(self, root, p, q):
+        # Once reached the end of the branch we return false
+        if root is None:
+            return False
+
+        # Start traversing recursively
+        left = self.recurse(root.left, p, q)
+
+        right = self.recurse(root.right, p, q)
+
+        curr = root.val == p or root.val == q
+
+        # If two values are set, that means the current node is the answer
+        if left + right + curr >= 2:
+            self.ans = root
+
+        # If any value is set, we'll return true since node has been found
+        return left or right or curr
+
+    # 236. Lowest Common Ancestor of a Binary Tree
+    def lowestCommonAncestor(self, root, p, q):
+        self.recurse(root, p, q)
+        return self.ans
+
+    def depth(self, root):
+        if not root:
+            return 0
+
+        return 1 + max(self.depth(root.right), self.depth(root.left))
+
+    # 110. Balanced Binary Tree
+    def isBalanced(self, root):
+        if not root:
+            return True
+
+        leftHeight = self.depth(root.left)
+
+        rightHeight = self.depth(root.right)
+
+        return abs(rightHeight - leftHeight) <= 1 and self.isBalanced(root.left) and self.isBalanced(root.right)
+
+    # 268. Missing Number
+    def missingNumber(self, nums):
+        # Will use exclusive or (xor) to cancel each number and be left with the answer
+        # (the one that could not be canceled), attaching to the property of xor a^b^b = a
+        xor = len(nums)
+        for i in range(len(nums)):
+            xor ^= i
+            xor ^= nums[i]
+        return xor
+
+    # 287. Find the Duplicate Number
+    def findDuplicate(self, nums):
+        slow = nums[0]
+        fast = nums[slow]
+        # Find the intersection
+        while slow != fast:
+            slow = nums[slow]
+            fast = nums[nums[fast]]
+
+        fast = 0
+        # At this time, the distance from the beginning and slow node will be the same to the goal node
+        while slow != fast:
+            slow = nums[slow]
+            fast = nums[fast]
+        return slow
+
+
+
+
 sol = Solution()
 
 # sol.numIslands([
@@ -234,4 +397,12 @@ sol = Solution()
 # sol.checkBST(tn)
 # sol.copyRandomList(rl)
 # sol.connect(nn)
-print(sol.removeDuplicateLetters('bcabc'))
+# sol.removeDuplicateLetters('bcabc')
+# sol.search([5, 1, 3], 3)
+# sol.recoverTree(tn)
+# sol.hasCycle(ll)
+# sol.detectCycle(ll)
+# sol.lowestCommonAncestor(tn, 8, 6)
+# sol.isBalanced(tn)
+# sol.missingNumber([3, 0, 1])
+# sol.findDuplicate([2, 3, 3, 1, 5])
