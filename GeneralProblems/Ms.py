@@ -84,8 +84,8 @@ class Solution:
                     grid[curr_row][curr_col] = '2'
                     queue.append([curr_row, curr_col])
 
-    def isValid(row, col, num_rows, num_cols):
-        return not (row >= num_rows or row < 0 or col >= num_cols or col < 0)
+    def isValid(self, row, col, num_rows, num_cols):
+        return num_rows > row >= 0 and num_cols > col >= 0
 
     def numIslands(self, grid):
         totalIslands = 0
@@ -125,7 +125,6 @@ class Solution:
         if not root:
             return True
         elif root.val <= min or root.val >= max:
-            print(root.val, min, max)
             return False
 
         # Recursion based on keeping and updating a local min and max
@@ -381,6 +380,111 @@ class Solution:
             fast = nums[fast]
         return slow
 
+    # 496. Next Greater Element I
+    def nextGreaterElement(self, nums1, nums2):
+        nge_map = {}  # map that points a number to its next greater element
+        stack = []  # structure to keep the next greater element on the run
+        ans = [-1] * len(nums1)
+        for num in nums2:
+            while stack and stack[-1] < num:
+                nge_map[stack.pop()] = num
+            stack.append(num)
+        # iterate through each of the numbers to be find and retrieve from stack
+        for idx, num in enumerate(nums1):
+            if num in nge_map:
+                ans[idx] = nge_map[num]
+        return ans
+
+    # 283. Move Zeroes
+    def moveZeroes(self, nums):
+        # the idea is to save the position of the last zero found and change it once a non-zero
+        # element has been found this will limit the number of operations to 1 per zero
+        lastZero = 0
+        for i in range(len(nums)):
+            if nums[i] != 0:
+                temp = nums[i]
+                nums[i] = nums[lastZero]
+                nums[lastZero] = temp
+                lastZero += 1
+
+    # 62. Unique Paths
+    def uniquePaths(self, m, n):
+        grid = [[None for _ in range(n + 1)] for _ in range(m + 1)] # memoization grid to save time calculating paths
+        return self.uniquePathsDFS(m, n, 0, 0, grid)
+
+    def uniquePathsDFS(self, m, n, row, col, grid):
+        if not self.isValid(row, col, m, n):
+            return 0
+
+        # goal reached
+        if row == m - 1 and col == n - 1:
+            return 1
+
+        if grid[row][col]:
+            return grid[row][col]
+
+        # robot can only move either down or right at any point in time, mark the cell as known
+        grid[row][col] = self.uniquePathsDFS(m, n, row + 1, col, grid) + self.uniquePathsDFS(m, n, row, col + 1, grid)
+        return grid[row][col]
+
+    # 63. Unique Paths II
+    def uniquePathsWithObstacles(self, obstacleGrid):
+        m = len(obstacleGrid)
+        n = len(obstacleGrid[0])
+        grid = [[None for _ in range(n + 1)] for _ in range(m + 1)]  # memoization grid to save time calculating paths
+        return self.uniquePathsWithObstaclesDFS(m, n, 0, 0, grid, obstacleGrid)
+
+    def uniquePathsWithObstaclesDFS(self, m, n, row, col, grid, obstacleGrid):
+        if not self.isValid(row, col, m, n) or obstacleGrid[row][col] == 1:
+            return 0
+
+        # goal reached
+        if row == m - 1 and col == n - 1:
+            return 1
+
+        if grid[row][col]:
+            return grid[row][col]
+
+        # robot can only move either down or right at any point in time, mark the cell as known
+        grid[row][col] = self.uniquePathsWithObstaclesDFS(m, n, row + 1, col, grid, obstacleGrid) +\
+                         self.uniquePathsWithObstaclesDFS(m, n, row, col + 1, grid, obstacleGrid)
+        return grid[row][col]
+
+    # 503. Next Greater Element II
+    def nextGreaterElements(self, nums):
+        n = len(nums)
+        stack = []
+        result = [-1] * n
+        # the idea is to emulate a circular array, using a stack for fast lookup
+        for i in range(n - 1, -1, -1):
+            # fill the stack with inverted indexes
+            stack.append(i)
+        for i in range(n - 1, -1, -1):
+            # append the current element index, for "circular" lookup
+            while stack and nums[stack[-1]] <= nums[i]:
+                stack.pop()
+            if stack:
+                result[i] = nums[stack[-1]]
+            stack.append(i)
+        return result
+
+    # 556. Next Greater Element III
+    def nextGreaterElementIII(self, n):
+        num = [x for x in str(n)]
+        length = len(num)
+        # start from right to left, finding where ascending order breaks
+        for i in range(length - 1, 0, -1):
+            if num[i - 1] < num[i]:
+                # swap with the smallest possible number from the numbers we have seen
+                for j in range(length - 1, i - 1, -1):
+                    if num[j] > num[i - 1]:
+                        num[i - 1], num[j] = num[j], num[i - 1]
+                        # now we just have to order from num[i] to num[len(n)-1]
+                        num[i:] = sorted(num[i:])
+                        ans = ''.join(num)
+                        return int(ans) if int(ans) < 2 ** 31 else -1
+
+        return -1
 
 
 
@@ -406,3 +510,9 @@ sol = Solution()
 # sol.isBalanced(tn)
 # sol.missingNumber([3, 0, 1])
 # sol.findDuplicate([2, 3, 3, 1, 5])
+# sol.nextGreaterElement([4,1,2], [1,3,4,2])
+# sol.moveZeroes([0,1,0,3,12])
+# sol.uniquePaths(23, 12)
+# sol.uniquePathsWithObstacles([[0,0]])
+# sol.nextGreaterElements([1, 2, 1])
+print(sol.nextGreaterElementIII(23102431))
