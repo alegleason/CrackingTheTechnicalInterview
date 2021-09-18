@@ -35,12 +35,11 @@ tn = TreeNode(7)
 tn.right = TreeNode(2)
 tn.right.right = TreeNode(1)
 
-ll = ListNode(3)
-ll2 = ListNode(2)
-ll.next = ll2
-ll.next.next = ListNode(0)
-ll.next.next.next = ListNode(-4)
-ll.next.next.next.next = ll2
+ll = ListNode(1)
+ll.next = ListNode(2)
+ll.next.next = ListNode(3)
+ll.next.next.next = ListNode(4)
+ll.next.next.next.next = ListNode(5)
 
 rl = Node(7)
 rl.next = Node(13)
@@ -86,6 +85,11 @@ class Solution:
 
     def isValid(self, row, col, num_rows, num_cols):
         return num_rows > row >= 0 and num_cols > col >= 0
+
+    def printList(self, head):
+        while head:
+            print(head.val)
+            head = head.next
 
     def numIslands(self, grid):
         totalIslands = 0
@@ -409,7 +413,7 @@ class Solution:
 
     # 62. Unique Paths
     def uniquePaths(self, m, n):
-        grid = [[None for _ in range(n + 1)] for _ in range(m + 1)] # memoization grid to save time calculating paths
+        grid = [[None for _ in range(n + 1)] for _ in range(m + 1)]  # memoization grid to save time calculating paths
         return self.uniquePathsDFS(m, n, 0, 0, grid)
 
     def uniquePathsDFS(self, m, n, row, col, grid):
@@ -446,7 +450,7 @@ class Solution:
             return grid[row][col]
 
         # robot can only move either down or right at any point in time, mark the cell as known
-        grid[row][col] = self.uniquePathsWithObstaclesDFS(m, n, row + 1, col, grid, obstacleGrid) +\
+        grid[row][col] = self.uniquePathsWithObstaclesDFS(m, n, row + 1, col, grid, obstacleGrid) + \
                          self.uniquePathsWithObstaclesDFS(m, n, row, col + 1, grid, obstacleGrid)
         return grid[row][col]
 
@@ -486,6 +490,77 @@ class Solution:
 
         return -1
 
+    # 22. Generate Parentheses
+    def generateParenthesis(self, n):
+        res = []
+
+        # The three keys of backtracking are: our choice, our constraints & our goal
+        def generateParenthesisHelper(toOpen, toClose, currStr):
+            # our choice: put an open or closed parentheses
+            if toOpen == 0:
+                # our goal
+                currStr += ")" * toClose
+                res.append(currStr)
+                # our constraints
+            elif toClose > toOpen:
+                generateParenthesisHelper(toOpen, toClose - 1, currStr + ")")
+                generateParenthesisHelper(toOpen - 1, toClose, currStr + "(")
+            else:
+                generateParenthesisHelper(toOpen - 1, toClose, currStr + "(")
+
+        generateParenthesisHelper(n, n, "")
+        return
+
+    # 328. Odd Even Linked List
+    def oddEvenList(self, head):
+        # cases when we don't have to do anything special
+        if not head or not head.next:
+            return head
+
+        # lists of length => 2
+        odd = head
+        even = head.next
+        evenHead = even
+        while even and even.next:
+            odd.next = even.next
+            odd = odd.next
+            even.next = odd.next
+            even = even.next
+
+        # join the two sublists
+        odd.next = evenHead
+        return head
+
+    # 395. Longest Substring with At Least K Repeating Characters
+    def longestSubstring(self, s, k):
+        n = len(s)
+        # base cases: not enough chars in the string or the whole string
+        if n == 0 or n < k:
+            return 0
+        if k <= 1:
+            return n
+
+        # creating the count map takes O(n) time, map can be considered as constant (O(26))
+        counter = Counter(s)
+        left = 0
+
+        # find where the string delimiter
+        while left < n and counter[s[left]] >= k:
+            left += 1
+
+        # only case when we are allowed to return is when we've finished the string (or substring)
+        if left >= n - 1:
+            return left
+
+        # recursive call to check for the string on the left
+        leftString = self.longestSubstring(s[0:left], k)
+        # avoid searching on substrings that contain characters that appear less than k times
+        while left < n and counter[s[left]] < k:
+            left += 1
+
+        # recursive call to check for the string on the right
+        rightString = self.longestSubstring(s[left:], k)
+        return max(leftString, rightString)
 
 
 sol = Solution()
@@ -515,4 +590,7 @@ sol = Solution()
 # sol.uniquePaths(23, 12)
 # sol.uniquePathsWithObstacles([[0,0]])
 # sol.nextGreaterElements([1, 2, 1])
-print(sol.nextGreaterElementIII(23102431))
+# sol.nextGreaterElementIII(23102431)
+# sol.generateParenthesis(3)
+# sol.printList(sol.oddEvenList(ll))
+print(sol.longestSubstring("ababacb", 3))
