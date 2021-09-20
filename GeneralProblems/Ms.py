@@ -1,5 +1,5 @@
 # Helper classes
-
+import math
 import sys
 from collections import Counter
 
@@ -562,6 +562,105 @@ class Solution:
         rightString = self.longestSubstring(s[left:], k)
         return max(leftString, rightString)
 
+    # 53. Maximum Subarray
+    def maxSubArray(self, nums):
+        if not nums or len(nums) == 1:
+            return nums
+        ans = nums[0]
+        # using Kadane's algorithm
+        for i in range(1, len(nums)):
+            nums[i] = max(nums[i], nums[i] + nums[i - 1])
+            ans = max(nums[i], ans)
+        return ans
+
+    # 1647. Minimum Deletions to Make Character Frequencies Unique
+    def minDeletions(self, s):
+        count = Counter(s)  # O(27) constant space
+        freq = set()  # O(27) constant
+        ans = 0
+        for _, k in count.items():
+            if k not in freq:
+                freq.add(k)
+            else:
+                n = k
+                while n in freq:  # keep deleting until
+                    n -= 1
+                    ans += 1
+                if n != 0: freq.add(n)
+        return ans
+
+    def validPalindrome(self, s):
+        # consider only alphanumeric characters
+        s = ''.join(i for i in s if i.isalnum() and i != 'ʼ')
+        # case insensitive
+        s = s.lower()
+        n = len(s) - 1
+        for i in range((n+1)//2):
+            if s[i] != s[n - i]:
+                return False
+        return True
+
+    # Helper function for below problem
+    def isValidPalindrome(self, s):
+        # A palindrome can have either an even count of chars or an even count plus 1 odd char
+        count = {}
+        odds = 0
+        for char in s:
+            # consider only alphanumeric characters
+            if not char.isalnum():
+                continue
+            char = char.lower()
+            if char not in count:
+                odds += 1
+                count[char] = 1
+            else:
+                count[char] += 1
+                if count[char] % 2 == 1:
+                    odds += 1
+                else:
+                    odds -= 1
+        return odds == 1 or odds == 0
+
+    def minSwapsToPalindrome(self, s):
+        # time O(n2)
+        if not self.isValidPalindrome(s):
+            return -1
+
+        # convert to list so it is mutable
+        s = list(s)
+
+        # set up left and right pointer
+        l, r, swaps = 0, len(s) - 1, 0
+
+        while l < r:
+
+            # case both characters are the same
+            if s[l] == s[r]:
+                l += 1
+                r -= 1
+
+            else:
+                # move right pointer until we find its equivalent
+                mid = r
+                while mid > l and s[mid] != s[l]:
+                    mid -= 1
+
+                # char does not has equivalent just move it to the left and it will eventually be in the middle
+                if mid == l:
+                    s[mid], s[mid + 1] = s[mid + 1], s[mid]
+                    swaps += 1
+                # case where we find the char, move it
+                else:
+                    for i in range(mid, r):
+                        s[i], s[i + 1] = s[i + 1], s[i]
+                        swaps += 1
+
+                l += 1
+                r -= 1
+        return swaps
+
+    prev = None
+
 
 sol = Solution()
 
@@ -593,4 +692,8 @@ sol = Solution()
 # sol.nextGreaterElementIII(23102431)
 # sol.generateParenthesis(3)
 # sol.printList(sol.oddEvenList(ll))
-print(sol.longestSubstring("ababacb", 3))
+# sol.longestSubstring("ababacb", 3)
+# sol.maxSubArray([5,4,-1,7,8])
+# sol.minDeletions("bbcebab")
+# sol.validPalindrome("race a car")
+# sol.minSwapsToPalindrome("ntiin")
