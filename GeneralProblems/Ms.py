@@ -595,7 +595,7 @@ class Solution:
         # case insensitive
         s = s.lower()
         n = len(s) - 1
-        for i in range((n+1)//2):
+        for i in range((n + 1) // 2):
             if s[i] != s[n - i]:
                 return False
         return True
@@ -659,7 +659,114 @@ class Solution:
                 r -= 1
         return swaps
 
-    prev = None
+    def minStepsPilesEqual(self, piles):
+        # O(nlogn) time and O(1) space
+        piles = sorted(piles, reverse=True)  # sort in ascending order
+        steps = 0
+        '''
+         Every time I meet a different number in the reverse-sorted array, I have to count how many numbers came
+         before, which represents the number of steps that was taken to reduce these numbers to the current number
+         '''
+        for i in range(1, len(piles)):
+            steps += i if piles[i] != piles[i - 1] else 0
+        print(steps)
+        return steps
+
+    def largestK(self, arr):
+        # O(nlogn) time complexity and O(n) space
+        arr = sorted(arr)
+        left, right = 0, len(arr) - 1
+        mx = 0
+        # 2-pointer technique
+        while left < right:
+            if abs(arr[right]) > abs(arr[left]):
+                right -= 1
+            elif abs(arr[right]) < abs(arr[left]):
+                left += 1
+            else:
+                mx = max(mx, abs(arr[right]))
+                # close the window
+                left += 1
+                right -= 1
+        return mx
+
+    # 1239. Maximum Length of a Concatenated String with Unique Characters
+    def maxLength(self, arr):
+        dp = [set()]
+        for string in arr:
+            # if the word has duplicate characters, ignore
+            if len(set(string)) < len(string):
+                continue
+            string = set(string)
+            for combination in dp[:]:  # adding the [:] avoids searching for the new appended strings
+                if string & combination:  # this means there is a conflict with the combination, so we ignore
+                    continue
+                # is equivalent to set.union(string, combination)
+                dp.append(string | combination)  # if there is no problem we append this new combination
+        # return the string with the maximum length
+        return max(len(a) for a in dp)
+
+    # 1304. Find N Unique Integers Sum up to Zero
+    def sumZero(self, n):
+        # naive approach ([0], [-1, 1])
+        res = [0] * n
+        l, r = 0, len(res) - 1
+        while (l * 2) + 1 < n:
+            curr = n - l
+            res[l] = curr
+            res[r] = curr * -1
+            l += 1
+            r -= 1
+        return res
+
+    def canPartitionKSubsets(self, nums, k):
+        targetSum = sum(nums) / k  # target integer value per bucket
+        targetSumRounded = math.floor(targetSum)
+        used = [False] * len(nums)
+        if targetSum - (targetSumRounded) != 0:
+            return False
+        else:
+            return self.canPartitionKSubsetsHelper(0, nums, used, k, 0, targetSumRounded)
+
+    def canPartitionKSubsetsHelper(self, iterationStart, nums, used, k, progressBucketSum, targetBucketSum):
+        # If we have filled k - 1 buckets, that means we'd be able to fill the last one, since sum%buckets == 0
+        if k == 1:
+            return True
+        if progressBucketSum == targetBucketSum:  # this means we have filled the current bucket
+            return self.canPartitionKSubsetsHelper(0, nums, used, k - 1, 0, targetBucketSum)
+        # case where we will continue trying to fill the buckets
+        for i in range(iterationStart, len(nums)):
+            if not used[i]:
+                used[i] = True  # choose the value to be used
+                if self.canPartitionKSubsetsHelper(i + 1, nums, used, k, progressBucketSum + nums[i], targetBucketSum):
+                    return True
+                used[i] = False  # unchoose the value since we were not able to use it
+        return False
+
+    # Find the largest Alphabetic character present in the string
+    def findLargestAlphabeticChar(self, s):
+        # O(n) time and O(26) space complexity
+        chars = set()
+        my_max = None
+        for char in s:
+            if char.islower():
+                # find its equivalent uppercase
+                if char.upper() in chars:
+                    if my_max is None:
+                        my_max = char.upper()
+                    else:
+                        my_max = max(my_max, char.upper())
+                else:
+                    chars.add(char)
+            else:
+                if char.lower() in chars:
+                    if my_max is None:
+                        my_max = char
+                    else:
+                        my_max = max(my_max, char)
+                else:
+                    chars.add(char)
+        return -1 if my_max is None else my_max
 
 
 sol = Solution()
@@ -697,3 +804,9 @@ sol = Solution()
 # sol.minDeletions("bbcebab")
 # sol.validPalindrome("race a car")
 # sol.minSwapsToPalindrome("ntiin")
+# sol.minStepsPilesEqual([1, 1, 2, 2, 2, 3, 3, 3, 4, 4])
+# sol.largestK([3,2,-2,5,-3])
+# sol.maxLength(["un","iq","ue"]) # -> 4
+# sol.sumZero(3)
+# sol.canPartitionKSubsets([2, 2, 2, 2, 3, 4, 5], 4)
+# sol.findLargestAlphabeticChar("dAeB")
