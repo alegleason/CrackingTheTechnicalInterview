@@ -151,7 +151,7 @@ class Solution:
         root.right = self.sortedListToBST(mid.next)
         return root
 
-    def mid(head):
+    def mid(self, head):
         slow, fast = head, head.next.next
         while fast and fast.next:
             slow = slow.next

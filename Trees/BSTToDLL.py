@@ -1,5 +1,4 @@
-#  Python program to convert a binary
-#  tree to a doubly linked list
+# Program to parse a binary tree to DLL
 
 class Node:
     def __init__(self, val):
@@ -7,31 +6,36 @@ class Node:
         self.left = None
         self.val = val
 
-
-class BT2LL:
+class BSTToDLLParser:
     def __init__(self):
         self.head = None
         self.tail = None
 
-    def convert(self, root):
-        # base case
-        if root is None:
+    def parse(self, root):
+        # base case, return
+        if not root:
             return
 
-        # convert recursively left tree
-        self.convert(root.left)
+        # recursively parse left subtree
+        self.parse(root.left)
 
         node = root
-        # left most element
-        if self.head is None:
+        # set the head of the list as the left most node (smallest one)
+        if not self.head:
             self.head = node
+        # else if the head is set, configure left node for the current node and
         else:
             self.tail.right = node
             node.left = self.tail
+        # update the tail
         self.tail = node
 
-        self.convert(root.right)
+        self.parse(root.right)
         return self.head
+
+
+
+
 
 def printDLL(head):
     # Function to print nodes in given doubly linked list
@@ -46,10 +50,10 @@ if __name__ == '__main__':
     root.right = Node(20)
     root.left.left = Node(5)
 
-    converter = BT2LL()
+    parser = BSTToDLLParser()
 
     # convert to DLL
-    head = converter.convert(root)
+    head = parser.parse(root)
 
-    # Print the converted list
+    # print the parsed list
     printDLL(head)
